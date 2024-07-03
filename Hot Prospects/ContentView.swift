@@ -5,30 +5,31 @@
 //  Created by Mehmet Alp Sönmez on 02/07/2024.
 //
 
+
 import SwiftUI
 
+
 struct ContentView: View {
-    @State private var backgroundColour = Color.red
     
     var body: some View {
-        List {
-            Text("Taylor Swift")
-                .swipeActions {
-                    Button("Delete", systemImage: "minus.circle", role: .destructive) {
-                        print("Delete")
-                    }
-                    Button("Message", systemImage: "message") {
-                        print("Hi")
-                    }
+        TabView {
+            ProspectsView(filter: .none)
+                .tabItem {
+                    Label("Everyone", systemImage: "person.3")
                 }
-                
-                    .swipeActions(edge: .leading) {
-                        Button("Pin", systemImage: "pin") {
-                            print("Pinning")
-                        }
-                        .tint(.orange)
-                    }
+            ProspectsView(filter: .contacted)
+                .tabItem {
+                    Label("Contacted", systemImage: "checkmark.circle")
                 }
+            ProspectsView(filter: .uncontancted)
+                .tabItem {
+                    Label("Uncontacted", systemImage: "questionmark.diamond")
+                }
+            MeView()
+                .tabItem {
+                    Label("Me", systemImage: "person.crop.square")
+                }
+            }
         }
     }
 
