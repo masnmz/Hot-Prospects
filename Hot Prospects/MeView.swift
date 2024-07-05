@@ -2,7 +2,7 @@
 //  MeView.swift
 //  Hot Prospects
 //
-//  Created by Mehmet Alp Sönmez on 03/07/2024.
+//  Created by Mehmet Alp Sönmez on 04/07/2024.
 //
 
 import SwiftUI

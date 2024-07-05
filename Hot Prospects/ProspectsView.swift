@@ -5,6 +5,7 @@
 //  Created by Mehmet Alp Sönmez on 03/07/2024.
 //
 
+import SwiftData
 import SwiftUI
 
 struct ProspectsView: View {
@@ -12,6 +13,8 @@ struct ProspectsView: View {
         case none, contacted, uncontancted
     }
     
+    @Environment(\.modelContext) var modelContext
+    @Query(sort: \Prospect.name) var prospects: [Prospect]
     let filter: FilterType
     
     var title: String {
@@ -27,13 +30,38 @@ struct ProspectsView: View {
     
     var body: some View {
         NavigationStack {
-            Text("Hello World")
-                .navigationTitle(title)
+            List(prospects) { prospect in
+                VStack(alignment: .leading) {
+                    Text(prospect.name)
+                        .font(.headline)
+                    Text(prospect.emailAddress)
+                        .foregroundStyle(.secondary)
+                }
+            }
+            .navigationTitle(title)
+            .toolbar {
+                Button("Scan", systemImage: "qrcode.viewfinder") {
+                    let prospect = Prospect(name: "Paul Hudson", emailAddress: "paul@hackingwithswift.com", isContacted: false)
+                    modelContext.insert(prospect)
+                }
+            }
         }
-            
+        
+    }
+    
+    init(filter: FilterType) {
+        self.filter = filter
+        
+        if filter != .none {
+            let showContactedOnly = filter == .contacted
+            _prospects = Query(filter: #Predicate {
+                $0.isContacted == showContactedOnly
+            }, sort: [SortDescriptor(\Prospect.name)])
+        }
     }
 }
 
 #Preview {
     ProspectsView(filter: .none)
+        .modelContainer(for: Prospect.self)
 }
