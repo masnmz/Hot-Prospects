@@ -15,6 +15,8 @@ struct ProspectsView: View {
     
     @Environment(\.modelContext) var modelContext
     @Query(sort: \Prospect.name) var prospects: [Prospect]
+    @State private var isShowingScanner = false
+    
     let filter: FilterType
     
     var title: String {
@@ -36,13 +38,17 @@ struct ProspectsView: View {
                         .font(.headline)
                     Text(prospect.emailAddress)
                         .foregroundStyle(.secondary)
+                        .swipeActions() {
+                            Button("Delete", systemImage: "trash", role: .destructive) {
+                                modelContext.delete(prospect)
+                            }
+                        }
                 }
             }
             .navigationTitle(title)
             .toolbar {
                 Button("Scan", systemImage: "qrcode.viewfinder") {
-                    let prospect = Prospect(name: "Paul Hudson", emailAddress: "paul@hackingwithswift.com", isContacted: false)
-                    modelContext.insert(prospect)
+                   isShowingScanner = true
                 }
             }
         }
