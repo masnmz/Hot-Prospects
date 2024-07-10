@@ -11,6 +11,7 @@ import SwiftUI
 struct MeView: View {
     @AppStorage("name") private var name = "Anonymous"
     @AppStorage("emailAddress") private var emailAddress = "you@yoursite.com"
+    @State private var qrCode = UIImage()
     
     let context = CIContext()
     let filter = CIFilter.qrCodeGenerator()
@@ -23,15 +24,28 @@ struct MeView: View {
                 TextField("Email Address", text: $emailAddress)
                     .textContentType(.emailAddress)
                     .font(.title)
-                
-                Image(uiImage: generateQRCode(from: "\(name)\n\(emailAddress)"))
-                    .interpolation(.none)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 200, height: 200)
+                HStack {
+                    Spacer()
+                    Image(uiImage: qrCode)
+                        .interpolation(.none)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 300, height: 300)
+                        .contextMenu {
+                            ShareLink(item: Image(uiImage: qrCode), preview: SharePreview("My QR Code", image: Image(uiImage: qrCode)))
+                        }
+                    Spacer()
+                }
             }
             .navigationTitle("Your Code")
+            .onAppear(perform: updateCode)
+            .onChange(of: name, updateCode)
+            .onChange(of: emailAddress, updateCode)
         }
+    }
+    
+    func updateCode() {
+        generateQRCode(from: "\(name)\n\(emailAddress)")
     }
     
     func generateQRCode(from string: String) -> UIImage {
@@ -39,7 +53,8 @@ struct MeView: View {
         
         if let outputImage = filter.outputImage {
             if let cgImage = context.createCGImage(outputImage, from: outputImage.extent) {
-                return UIImage(cgImage: cgImage)
+                qrCode = UIImage(cgImage: cgImage)
+                return qrCode
             }
         }
         
